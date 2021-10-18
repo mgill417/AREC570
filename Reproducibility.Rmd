@@ -2,43 +2,41 @@
 title: "Reproducibility"
 author: "Mackenzie Gill"
 date: "10/17/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r, echo=FALSE}
 ## Importing Data
-Importing data files into an inputs directory:
-
-```{r}
-setwd("~/OneDrive - Colostate/570/AREC570/inputs") #setting working directory
+setwd("~/OneDrive - Colostate/570/AREC570")
 library(readr)
-gdp_52_67 <- read_csv("gdp_52-67.csv") #GDP from 1952-1967
-le_52_67 <- read_csv("le_52-67.csv") #Life expectancy from 1952-1967
+gdp_52_67 <- read.csv("gdp_52-67.csv") #GDP from 1952-1967
+le_52_67 <- read.csv("le_52-67.csv") #Life expectancy from 1952-1967
 
 
 ```
 
-## creating a single table of variables
 
-```{r}
-
+```{r, echo=FALSE}
+## creating a single table
 t<- merge(gdp_52_67, le_52_67 , by= c("continent","country", "year"))
-t
 
 ```
+
 ## Canada 
-The first graph shows that life expectancy has been increasing over this period of time in Canada. The second graph shows that per capita GDP is also increasing over this period of time in Canada. The simialr trend observed suggests that these factors may be correlated. 
+Figure 1 shows that life expectancy has been increasing over time in Canada. That is good. Figure 2 shows that Canad’s GDP per capita is also increasing over time. Go Canada!
+I wonder if these two data are correlated?
 
-
-```{r}
+```{r, echo=FALSE}
 Canada<-subset(t, country=="Canada")
-Canada
 
 gdpPercap<- (Canada$gdp / Canada$pop)
-gdpPercap
 
 GdpPercap<- plot(Canada$year, gdpPercap,
       main = "GDP per Capita from 1952-1967", 
@@ -49,10 +47,11 @@ lifeExp<- plot(Canada$year, Canada$lifeExp,
                ylab = "Life expectancy", xlab = "Year", type = "l", col="red")
 
 ```
-## Life Expectancy and GDP 
-So now, we can see if GDP per capita leads to higher life expectancy. We expect the relationship between GDP per capita and life expectancy to be positive. To test this, we regress life expectancy from 140 countries on GDP per-capita. The results are displayed in Table 1.
 
-```{r}
+## Life Expectancy and GDP 
+The objective of this analysis is to test whether GDP per capita leads to higher life expectancy. We hypothesize that the relationship between GDP per capita and life expectancy is positive. We regress life expectancy from 140 countries on GDP per-capita to test our hypothesis. The results are displayed in Table 1.
+
+```{r, echo=FALSE}
 #install.packages("sjPlot")
 #install.packages("sjmisc")
 #install.packages("sjlabelled")
@@ -61,21 +60,16 @@ library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
 
-
 gdpPercap2<- (t$gdp / t$pop)
 lifeexp<- (t$lifeExp)
 
 M<- lm(lifeexp~gdpPercap2, data = t)
-summary(M)
 
 tab_model(M, collapse.ci = TRUE, p.style = "stars", digits = 4, title = "Table 1")
 
 ```
 
-The estimated coefficient on gdpPercap is positive and statistically significant at α = 0.001. This implies that for a $10,000 increase in GDP per capita, life expectancy increases by five years.
-This linear model implies that by increasing GDP, we can increase life expectancy continuously.
-This is not realistic, as there is a limit to humans' potential life expectancy. Thus, further research should focus on the nonlinear relationship between these factors.
-
-
-
+The coefficient on gdpPercap is positive and statistically significant at alpha =  0.05, which indicates that for every $10,000 increase in GDP per capita, life expectancy increases by five years.
+We can conclude that by continually increasing GDP we can increase life expectancy.
+Further research should focus on the nonlinear relationship between life expectancy and GDP per capita.
 
